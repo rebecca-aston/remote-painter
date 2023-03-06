@@ -2,4 +2,4 @@
  
 This is a web-sockets with socket.io multi-user drawing example. 
 
-The live example can be seen on glitch.   
+The live example can be seen on glitch: [https://remote-painter.glitch.me/](https://remote-painter.glitch.me/)
