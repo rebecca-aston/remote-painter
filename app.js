@@ -3,7 +3,7 @@
 const express = require("express");
 const app = express();
 const http = require("http");
-const server = http.createServer(app);
+const server = http.createServer(app);//socket io needs an http server
 const { Server } = require("socket.io");
 const io = new Server(server);
 
@@ -15,7 +15,7 @@ server.listen(3000, () => {
   console.log("listening on *:3000");
 });
 
-let printEveryMessage = false; 
+let printEveryMessage = true; 
 
 // Callback function for what to do when our P5.JS sketch connects and sends us messages
 io.on("connection", (socket) => {

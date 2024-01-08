@@ -1,3 +1,13 @@
+//Glitch uses ES Lint to show errors, this does not play nicely with external libraries like p5, the line below will turn off those errors:
+/*eslint no-undef: 0*/ 
+
+/*
+This is a very simple multi-user painting app. If you wanted to expand this, it would be better to use an offscreen buffer:
+https://p5js.org/reference/#/p5/createGraphics
+
+That way you could create a drawing that the user can zoom in and out of rather than scaling the drawing to the user's screen.
+*/
+
 // Create connection to Node.JS Server
 const socket = io();
 let sizeSlider;
@@ -7,17 +17,17 @@ let canvas;
 let gui; 
 let drawIsOn = false;
 let button;
+let brushColor;
 
 function setup() {
   canvas = createCanvas(windowWidth, windowHeight);
   canvas.parent("sketch-container"); 
-  canvas.mousePressed(canvasMousePressed);//we only want to start draw when clicking on canvas element
-
+  canvas.mousePressed(startDrawing);//we only want to start draw when clicking on canvas element
+  canvas.touchStarted(startDrawing);
+  
   //add our gui
   gui = select("#gui-container");
   gui.addClass("open");//forcing it open at the start, remove if you want it closed
-
-  // add the color sliders here
 
 
   // before you add the size slider
@@ -44,23 +54,33 @@ function setup() {
   //set styling for the sketch
   background(255);
   noStroke();
+  
+  //give a random color when you first load the sketch in the browser
+  brushColor = color(random(255),random(255),random(255));
 }
 
 function draw() {
 
   if(drawIsOn){
-    fill(0);
+    fill(brushColor);
     circle(mouseX,mouseY,bSize);
   }
 
 }
 
+//Make this work on both mobile touch devices and computers
 //we only want to draw if the click is on the canvas not on our GUI
-function canvasMousePressed(){
+//touch and mouse start events will call this callback
+function startDrawing(){
   drawIsOn = true;
 }
 
+//for end of interaction and movement we want to capture event even if not on canvas
 function mouseReleased(){
+  drawIsOn = false;
+}
+
+function touchEnded(){
   drawIsOn = false;
 }
 
@@ -71,17 +91,35 @@ function mouseDragged() {
     return;
   }
 
-  socket.emit("drawing", {
-    xpos: mouseX / width,
-    ypos: mouseY / height,
-    userS: bSize / width
-  });
+ emitData();
 
 }
 
+function touchMoved() {
+  if(!drawIsOn){
+    return;
+  }
+  
+ emitData();
+  
+}
+
+function emitData(){
+   socket.emit("drawing", {
+    xpos: mouseX / width,
+    ypos: mouseY / height,
+    userR: red(brushColor), //get the color channels
+    userG: green(brushColor),
+    userB: blue(brushColor),
+    userS: bSize  // userS: bSize / width  //see what's it's like to scale to users window
+  });
+}
+
+
 function onDrawingEvent(data){
-  fill(0);
-  circle(data.xpos * width,data.ypos * height,data.userS * width);
+  fill(data.userR,data.userG,data.userB);
+  // circle(data.xpos * width,data.ypos * height,data.userS*width);//scale to users window
+  circle(data.xpos * width,data.ypos * height,data.userS);
 }
 
 function handleButtonPress()
@@ -94,7 +132,6 @@ function handleSliderInputChange(){
 }
 
 //Events we are listening for
-
 // Connect to Node.JS Server
 socket.on("connect", () => {
   console.log(socket.id);
