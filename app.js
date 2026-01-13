@@ -15,7 +15,7 @@ server.listen(3000, () => {
   console.log("listening on *:3000");
 });
 
-let printEveryMessage = true; 
+let printEveryMessage = false; 
 
 // Callback function for what to do when our P5.JS sketch connects and sends us messages
 io.on("connection", (socket) => {
