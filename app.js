@@ -1,10 +1,11 @@
 // Import Libraries and Setup
 
-const express = require("express");
+import express from "express";
+import http from "http";
+import { Server } from "socket.io";
+
 const app = express();
-const http = require("http");
 const server = http.createServer(app);//socket io needs an http server
-const { Server } = require("socket.io");
 const io = new Server(server);
 const port = process.env.PORT || 3000;
 
