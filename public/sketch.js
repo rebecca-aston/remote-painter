@@ -23,7 +23,7 @@ function setup() {
   canvas = createCanvas(windowWidth, windowHeight);
   canvas.parent("sketch-container"); 
   canvas.mousePressed(startDrawing);//we only want to start draw when clicking on canvas element
-  // canvas.touchStarted(startDrawing);
+  canvas.touchStarted(startDrawing);
   
   //add our gui
   gui = select("#gui-container");
@@ -80,9 +80,9 @@ function mouseReleased(){
   drawIsOn = false;
 }
 
-// function touchEnded(){
-//   drawIsOn = false;
-// }
+function touchEnded(){
+  drawIsOn = false;
+}
 
 function mouseDragged() {
 
@@ -95,14 +95,14 @@ function mouseDragged() {
 
 }
 
-// function touchMoved() {
-//   if(!drawIsOn){
-//     return;
-//   }
+function touchMoved() {
+  if(!drawIsOn){
+    return;
+  }
   
-//  emitData();
+ emitData();
   
-// }
+}
 
 function emitData(){
    socket.emit("drawing", {
